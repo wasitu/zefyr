@@ -117,6 +117,12 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.block.numberList].
   static NotusAttribute<String> get ol => block.numberList;
 
+  /// Alias for [NotusAttribute.block.checked].
+  static NotusAttribute<String> get checked => block.checked;
+
+  /// Alias for [NotusAttribute.block.unchecked].
+  static NotusAttribute<String> get unchecked => block.unchecked;
+
   /// Alias for [NotusAttribute.block.quote].
   static NotusAttribute<String> get bq => block.quote;
 
@@ -379,6 +385,14 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a number list.
   NotusAttribute<String> get numberList =>
       NotusAttribute<String>._(key, scope, 'ol');
+
+  /// Formats a block of lines as a checked
+  NotusAttribute<String> get checked =>
+      NotusAttribute<String>._(key, scope, 'checked');
+
+  /// Formats a block of lines as a unchecked
+  NotusAttribute<String> get unchecked =>
+      NotusAttribute<String>._(key, scope, 'unchecked');
 
   /// Formats a block of lines as a code snippet, using monospace font.
   NotusAttribute<String> get code =>

@@ -305,6 +305,12 @@ class AttributeTheme {
   /// Style theme used to render number lists.
   final BlockTheme numberList;
 
+  /// Style theme used to render checked.
+  final BlockTheme checked;
+
+  /// Style theme used to render unchecked.
+  final BlockTheme unchecked;
+
   /// Style theme used to render quote blocks.
   final BlockTheme quote;
 
@@ -321,6 +327,8 @@ class AttributeTheme {
     this.heading3,
     this.bulletList,
     this.numberList,
+    this.checked,
+    this.unchecked,
     this.quote,
     this.code,
   });
@@ -383,6 +391,14 @@ class AttributeTheme {
         linePadding: EdgeInsets.symmetric(vertical: 2.0),
       ),
       numberList: BlockTheme(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        linePadding: EdgeInsets.symmetric(vertical: 2.0),
+      ),
+      checked: BlockTheme(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        linePadding: EdgeInsets.symmetric(vertical: 2.0),
+      ),
+      unchecked: BlockTheme(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         linePadding: EdgeInsets.symmetric(vertical: 2.0),
       ),

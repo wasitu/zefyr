@@ -24,11 +24,8 @@ class ZefyrList extends StatelessWidget {
       index++;
     }
 
-    final isNumberList =
-        node.style.get(NotusAttribute.block) == NotusAttribute.block.numberList;
-    var padding = isNumberList
-        ? theme.attributeTheme.numberList.padding
-        : theme.attributeTheme.bulletList.padding;
+    var padding =
+        node.style.get(NotusAttribute.block).blockTheme(context).padding;
     padding = padding.copyWith(left: theme.indentWidth);
 
     return Padding(
@@ -55,11 +52,7 @@ class ZefyrListItem extends StatelessWidget {
     final BlockNode block = node.parent;
     final style = block.style.get(NotusAttribute.block);
     final theme = ZefyrTheme.of(context);
-    final blockTheme = (style == NotusAttribute.block.bulletList)
-        ? theme.attributeTheme.bulletList
-        : theme.attributeTheme.numberList;
-    final bulletText =
-        (style == NotusAttribute.block.bulletList) ? '•' : '$index.';
+    final blockTheme = style.blockTheme(context);
 
     TextStyle textStyle;
     Widget content;
@@ -80,8 +73,19 @@ class ZefyrListItem extends StatelessWidget {
       padding = blockTheme.linePadding;
     }
 
-    Widget bullet =
-        SizedBox(width: 24.0, child: Text(bulletText, style: textStyle));
+    Widget bullet;
+    if (style == NotusAttribute.block.checked) {
+      bullet = Checkbox(
+        value: true,
+        onChanged: (bool value) {},
+      );
+    } else if (style == NotusAttribute.block.unchecked) {
+      bullet = Checkbox(value: false, onChanged: (bool value) {});
+    } else {
+      final bulletText = style.bulletText(index);
+      bullet = SizedBox(width: 24.0, child: Text(bulletText, style: textStyle));
+    }
+
     if (padding != null) {
       bullet = Padding(padding: padding, child: bullet);
     }
@@ -90,5 +94,25 @@ class ZefyrListItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[bullet, Expanded(child: content)],
     );
+  }
+}
+
+extension on NotusAttribute {
+  BlockTheme blockTheme(BuildContext context) {
+    if (this == NotusAttribute.block.numberList) {
+      return ZefyrTheme.of(context).attributeTheme.numberList;
+    } else if (this == NotusAttribute.block.checked) {
+      return ZefyrTheme.of(context).attributeTheme.checked;
+    } else if (this == NotusAttribute.block.unchecked) {
+      return ZefyrTheme.of(context).attributeTheme.unchecked;
+    }
+    return ZefyrTheme.of(context).attributeTheme.bulletList;
+  }
+
+  String bulletText(int index) {
+    if (this == NotusAttribute.block.numberList) {
+      return '$index.';
+    }
+    return '•';
   }
 }

@@ -258,6 +258,10 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       return ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.numberList) {
       return ZefyrList(node: block);
+    } else if (blockStyle == NotusAttribute.block.checked) {
+      return ZefyrList(node: block);
+    } else if (blockStyle == NotusAttribute.block.unchecked) {
+      return ZefyrList(node: block);
     } else if (blockStyle == NotusAttribute.block.quote) {
       return ZefyrQuote(node: block);
     }
