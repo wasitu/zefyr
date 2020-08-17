@@ -10,6 +10,7 @@ import 'document/block.dart';
 import 'document/leaf.dart';
 import 'document/line.dart';
 import 'document/node.dart';
+import 'document/checkbox.dart';
 import 'heuristics.dart';
 
 /// Source of a [NotusChange].
@@ -201,9 +202,10 @@ class NotusDocument {
   LookupResult lookupLine(int offset) {
     // TODO: prevent user from moving caret after last line-break.
     var result = _root.lookup(offset, inclusive: true);
-    if (result.node is LineNode) return result;
-    BlockNode block = result.node;
-    return block.lookup(result.offset, inclusive: true);
+    if (result.node is BlockNode) {
+      return (result.node as BlockNode).lookup(result.offset, inclusive: true);
+    }
+    return result;
   }
 
   /// Composes [change] into this document.
@@ -288,6 +290,7 @@ class NotusDocument {
     final node = _root.last;
     if (node is LineNode &&
         node.parent is! BlockNode &&
+        node.parent is! CheckboxNode &&
         node.style.isEmpty &&
         _root.childCount > 1) {
       _root.remove(node);

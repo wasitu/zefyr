@@ -78,6 +78,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
+    NotusAttribute.checkbox.key: NotusAttribute.checkbox
   };
 
   // Inline attributes
@@ -117,17 +118,21 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Alias for [NotusAttribute.block.numberList].
   static NotusAttribute<String> get ol => block.numberList;
 
-  /// Alias for [NotusAttribute.block.checked].
-  static NotusAttribute<String> get checked => block.checked;
-
-  /// Alias for [NotusAttribute.block.unchecked].
-  static NotusAttribute<String> get unchecked => block.unchecked;
-
   /// Alias for [NotusAttribute.block.quote].
   static NotusAttribute<String> get bq => block.quote;
 
   /// Alias for [NotusAttribute.block.code].
   static NotusAttribute<String> get code => block.code;
+
+  /// Checkbox attribute
+  // ignore: const_eval_throws_exception
+  static const checkbox = CheckboxAttributeBuilder._();
+
+  /// Alias for [NotusAttribute.block.checked].
+  static NotusAttribute<String> get checked => checkbox.checked;
+
+  /// Alias for [NotusAttribute.block.unchecked].
+  static NotusAttribute<String> get unchecked => checkbox.unchecked;
 
   /// Embed style attribute.
   // ignore: const_eval_throws_exception
@@ -386,14 +391,6 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   NotusAttribute<String> get numberList =>
       NotusAttribute<String>._(key, scope, 'ol');
 
-  /// Formats a block of lines as a checked
-  NotusAttribute<String> get checked =>
-      NotusAttribute<String>._(key, scope, 'checked');
-
-  /// Formats a block of lines as a unchecked
-  NotusAttribute<String> get unchecked =>
-      NotusAttribute<String>._(key, scope, 'unchecked');
-
   /// Formats a block of lines as a code snippet, using monospace font.
   NotusAttribute<String> get code =>
       NotusAttribute<String>._(key, scope, 'code');
@@ -401,6 +398,23 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a quote.
   NotusAttribute<String> get quote =>
       NotusAttribute<String>._(key, scope, 'quote');
+}
+
+/// Builder for checkbox attribute styles (number/bullet lists, code and quote).
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.block] instead.
+class CheckboxAttributeBuilder extends NotusAttributeBuilder<String> {
+  const CheckboxAttributeBuilder._()
+      : super._('checkbox', NotusAttributeScope.line);
+
+  /// Formats a checkbox of lines as a checked
+  NotusAttribute<String> get checked =>
+      NotusAttribute<String>._(key, scope, 'checked');
+
+  /// Formats a checkbox of lines as a unchecked
+  NotusAttribute<String> get unchecked =>
+      NotusAttribute<String>._(key, scope, 'unchecked');
 }
 
 class EmbedAttributeBuilder

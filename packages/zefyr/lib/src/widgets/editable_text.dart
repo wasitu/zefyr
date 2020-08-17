@@ -250,23 +250,29 @@ class _ZefyrEditableTextState extends State<ZefyrEditableText>
       return ZefyrParagraph(node: node);
     }
 
-    final BlockNode block = node;
-    final blockStyle = block.style.get(NotusAttribute.block);
-    if (blockStyle == NotusAttribute.block.code) {
-      return ZefyrCode(node: block);
-    } else if (blockStyle == NotusAttribute.block.bulletList) {
-      return ZefyrList(node: block);
-    } else if (blockStyle == NotusAttribute.block.numberList) {
-      return ZefyrList(node: block);
-    } else if (blockStyle == NotusAttribute.block.checked) {
-      return ZefyrList(node: block);
-    } else if (blockStyle == NotusAttribute.block.unchecked) {
-      return ZefyrList(node: block);
-    } else if (blockStyle == NotusAttribute.block.quote) {
-      return ZefyrQuote(node: block);
+    if (node is CheckboxNode) {
+      final style = node.style.get(NotusAttribute.checkbox);
+      if (style == NotusAttribute.checkbox.checked) {
+        return ZefyrList(node: node);
+      } else if (style == NotusAttribute.checkbox.unchecked) {
+        return ZefyrList(node: node);
+      }
     }
 
-    throw UnimplementedError('Block format $blockStyle.');
+    if (node is BlockNode) {
+      final blockStyle = node.style.get(NotusAttribute.block);
+      if (blockStyle == NotusAttribute.block.code) {
+        return ZefyrCode(node: node);
+      } else if (blockStyle == NotusAttribute.block.bulletList) {
+        return ZefyrList(node: node);
+      } else if (blockStyle == NotusAttribute.block.numberList) {
+        return ZefyrList(node: node);
+      } else if (blockStyle == NotusAttribute.block.quote) {
+        return ZefyrQuote(node: node);
+      }
+    }
+
+    throw UnimplementedError('$node');
   }
 
   void _updateSubscriptions([ZefyrEditableText oldWidget]) {

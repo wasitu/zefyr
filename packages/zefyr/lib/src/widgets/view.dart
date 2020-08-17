@@ -93,22 +93,28 @@ class ZefyrViewState extends State<ZefyrView> {
       return ZefyrParagraph(node: node);
     }
 
-    final BlockNode block = node;
-    final blockStyle = block.style.get(NotusAttribute.block);
-    if (blockStyle == NotusAttribute.block.code) {
-      return ZefyrCode(node: block);
-    } else if (blockStyle == NotusAttribute.block.bulletList) {
-      return ZefyrList(node: block);
-    } else if (blockStyle == NotusAttribute.block.numberList) {
-      return ZefyrList(node: block);
-    } else if (blockStyle == NotusAttribute.block.checked) {
-      return ZefyrList(node: block);
-    } else if (blockStyle == NotusAttribute.block.unchecked) {
-      return ZefyrList(node: block);
-    } else if (blockStyle == NotusAttribute.block.quote) {
-      return ZefyrQuote(node: block);
+    if (node is BlockNode) {
+      final blockStyle = node.style.get(NotusAttribute.block);
+      if (blockStyle == NotusAttribute.block.code) {
+        return ZefyrCode(node: node);
+      } else if (blockStyle == NotusAttribute.block.bulletList) {
+        return ZefyrList(node: node);
+      } else if (blockStyle == NotusAttribute.block.numberList) {
+        return ZefyrList(node: node);
+      } else if (blockStyle == NotusAttribute.block.quote) {
+        return ZefyrQuote(node: node);
+      }
     }
 
-    throw UnimplementedError('Block format $blockStyle.');
+    if (node is CheckboxNode) {
+      final style = node.style.get(NotusAttribute.checkbox);
+      if (style == NotusAttribute.checkbox.checked) {
+        return ZefyrLine(node: node as LineNode);
+      } else if (style == NotusAttribute.checkbox.unchecked) {
+        return ZefyrLine(node: node as LineNode);
+      }
+    }
+
+    throw UnimplementedError('$node');
   }
 }

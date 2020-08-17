@@ -24,9 +24,18 @@ class ZefyrList extends StatelessWidget {
       index++;
     }
 
-    var padding =
-        node.style.get(NotusAttribute.block).blockTheme(context).padding;
-    padding = padding.copyWith(left: theme.indentWidth);
+    var padding = node.style.blockTheme(context).padding;
+    if (!(node is CheckboxNode)) {
+      padding = padding.copyWith(left: theme.indentWidth);
+    }
+
+    if (node is CheckboxNode && node.next is CheckboxNode) {
+      padding = padding.copyWith(bottom: 0);
+    }
+
+    if (node is CheckboxNode && node.previous is CheckboxNode) {
+      padding = padding.copyWith(top: 0);
+    }
 
     return Padding(
       padding: padding,
@@ -50,9 +59,14 @@ class ZefyrListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final BlockNode block = node.parent;
-    final style = block.style.get(NotusAttribute.block);
+    NotusAttribute style;
+    if (node.parent is CheckboxNode) {
+      style = block.style.get(NotusAttribute.checkbox);
+    } else if (node.parent is BlockNode) {
+      style = block.style.get(NotusAttribute.block);
+    }
     final theme = ZefyrTheme.of(context);
-    final blockTheme = style.blockTheme(context);
+    final blockTheme = block.style.blockTheme(context);
 
     TextStyle textStyle;
     Widget content;
@@ -74,13 +88,19 @@ class ZefyrListItem extends StatelessWidget {
     }
 
     Widget bullet;
-    if (style == NotusAttribute.block.checked) {
-      bullet = Checkbox(
-        value: true,
-        onChanged: (bool value) {},
-      );
-    } else if (style == NotusAttribute.block.unchecked) {
-      bullet = Checkbox(value: false, onChanged: (bool value) {});
+    if (style == NotusAttribute.checkbox.checked) {
+      bullet = SizedBox(
+          width: 32,
+          height: 24,
+          child: Checkbox(
+            value: true,
+            onChanged: (bool value) {},
+          ));
+    } else if (style == NotusAttribute.checkbox.unchecked) {
+      bullet = SizedBox(
+          width: 32,
+          height: 24,
+          child: Checkbox(value: false, onChanged: (bool value) {}));
     } else {
       final bulletText = style.bulletText(index);
       bullet = SizedBox(width: 24.0, child: Text(bulletText, style: textStyle));
@@ -90,6 +110,11 @@ class ZefyrListItem extends StatelessWidget {
       bullet = Padding(padding: padding, child: bullet);
     }
 
+    // TODO: toggle with canEdit
+    if (true) {
+      bullet = IgnorePointer(ignoring: true, child: bullet);
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[bullet, Expanded(child: content)],
@@ -97,18 +122,20 @@ class ZefyrListItem extends StatelessWidget {
   }
 }
 
-extension on NotusAttribute {
+extension on NotusStyle {
   BlockTheme blockTheme(BuildContext context) {
-    if (this == NotusAttribute.block.numberList) {
+    if (contains(NotusAttribute.block.numberList)) {
       return ZefyrTheme.of(context).attributeTheme.numberList;
-    } else if (this == NotusAttribute.block.checked) {
+    } else if (contains(NotusAttribute.checkbox.checked)) {
       return ZefyrTheme.of(context).attributeTheme.checked;
-    } else if (this == NotusAttribute.block.unchecked) {
+    } else if (contains(NotusAttribute.checkbox.unchecked)) {
       return ZefyrTheme.of(context).attributeTheme.unchecked;
     }
     return ZefyrTheme.of(context).attributeTheme.bulletList;
   }
+}
 
+extension on NotusAttribute {
   String bulletText(int index) {
     if (this == NotusAttribute.block.numberList) {
       return '$index.';
