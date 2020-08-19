@@ -296,6 +296,7 @@ class PreserveBlockStyleOnPasteRule extends InsertRule {
 
     Map<String, dynamic> resetStyle;
     Map<String, dynamic> blockStyle;
+    Map<String, dynamic> checkboxStyle;
     if (lineStyle != null) {
       if (lineStyle.containsKey(NotusAttribute.heading.key)) {
         resetStyle = NotusAttribute.heading.unset.toJson();
@@ -304,6 +305,12 @@ class PreserveBlockStyleOnPasteRule extends InsertRule {
       if (lineStyle.containsKey(NotusAttribute.block.key)) {
         blockStyle = <String, dynamic>{
           NotusAttribute.block.key: lineStyle[NotusAttribute.block.key]
+        };
+      }
+
+      if (lineStyle.containsKey(NotusAttribute.checkbox.key)) {
+        checkboxStyle = <String, dynamic>{
+          NotusAttribute.checkbox.key: lineStyle[NotusAttribute.checkbox.key]
         };
       }
     }
@@ -320,7 +327,7 @@ class PreserveBlockStyleOnPasteRule extends InsertRule {
       } else if (i == lines.length - 1) {
         if (resetStyle != null) result.retain(1, resetStyle);
       } else {
-        result.insert('\n', blockStyle);
+        result.insert('\n', blockStyle ?? checkboxStyle);
       }
     }
 

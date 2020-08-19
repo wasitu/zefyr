@@ -17,6 +17,7 @@ dependencies:
   # notus: ^0.1.0
   meta: ^1.1.0
   quiver_hashcode: ^2.0.0
+  numerus: ^1.0.3
 
   notus:
     git:

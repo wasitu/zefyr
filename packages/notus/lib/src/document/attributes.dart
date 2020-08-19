@@ -78,7 +78,8 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
-    NotusAttribute.checkbox.key: NotusAttribute.checkbox
+    NotusAttribute.checkbox.key: NotusAttribute.checkbox,
+    NotusAttribute.indent.key: NotusAttribute.indent
   };
 
   // Inline attributes
@@ -128,11 +129,15 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   // ignore: const_eval_throws_exception
   static const checkbox = CheckboxAttributeBuilder._();
 
-  /// Alias for [NotusAttribute.block.checked].
+  /// Alias for [NotusAttribute.checkbox.checked].
   static NotusAttribute<String> get checked => checkbox.checked;
 
-  /// Alias for [NotusAttribute.block.unchecked].
+  /// Alias for [NotusAttribute.checkbox.unchecked].
   static NotusAttribute<String> get unchecked => checkbox.unchecked;
+
+  /// Indent attribute
+  // ignore: const_eval_throws_exception
+  static const indent = IndentAttributeBuilder._();
 
   /// Embed style attribute.
   // ignore: const_eval_throws_exception
@@ -403,7 +408,7 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
 /// Builder for checkbox attribute styles (number/bullet lists, code and quote).
 ///
 /// There is no need to use this class directly, consider using
-/// [NotusAttribute.block] instead.
+/// [NotusAttribute.checkbox] instead.
 class CheckboxAttributeBuilder extends NotusAttributeBuilder<String> {
   const CheckboxAttributeBuilder._()
       : super._('checkbox', NotusAttributeScope.line);
@@ -415,6 +420,15 @@ class CheckboxAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a checkbox of lines as a unchecked
   NotusAttribute<String> get unchecked =>
       NotusAttribute<String>._(key, scope, 'unchecked');
+}
+
+/// Builder for checkbox attribute styles (number/bullet lists, code and quote).
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.indent] instead.
+class IndentAttributeBuilder extends NotusAttributeBuilder<int> {
+  const IndentAttributeBuilder._()
+      : super._('indent', NotusAttributeScope.line);
 }
 
 class EmbedAttributeBuilder

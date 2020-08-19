@@ -1,8 +1,11 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
+import 'package:numerus/numerus.dart';
 
 import 'common.dart';
 import 'paragraph.dart';
@@ -16,18 +19,20 @@ class ZefyrList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ZefyrTheme.of(context);
     final items = <Widget>[];
     var index = 1;
-    for (var line in node.children) {
-      items.add(_buildItem(line, index));
-      index++;
+    for (var child in node.children) {
+      items.add(_buildItem(child, index));
+      LineNode line = child;
+      if (line.style.get(NotusAttribute.indent) ==
+          line.nextLine.style.get(NotusAttribute.indent)) {
+        index++;
+      } else {
+        index = 1;
+      }
     }
 
     var padding = node.style.blockTheme(context).padding;
-    if (!(node is CheckboxNode)) {
-      padding = padding.copyWith(left: theme.indentWidth);
-    }
 
     if (node is CheckboxNode && node.next is CheckboxNode) {
       padding = padding.copyWith(bottom: 0);
@@ -45,15 +50,22 @@ class ZefyrList extends StatelessWidget {
 
   Widget _buildItem(Node node, int index) {
     LineNode line = node;
-    return ZefyrListItem(index: index, node: line);
+    final style = line.style.get(NotusAttribute.indent);
+    return ZefyrListItem(index: index, indent: style?.value ?? 0, node: line);
   }
 }
 
 /// An item in a [ZefyrList].
 class ZefyrListItem extends StatelessWidget {
-  ZefyrListItem({Key key, this.index, this.node}) : super(key: key);
+  ZefyrListItem({
+    Key key,
+    this.index,
+    this.indent = 0,
+    this.node,
+  }) : super(key: key);
 
   final int index;
+  final int indent;
   final LineNode node;
 
   @override
@@ -102,8 +114,19 @@ class ZefyrListItem extends StatelessWidget {
           height: 24,
           child: Checkbox(value: false, onChanged: (bool value) {}));
     } else {
-      final bulletText = style.bulletText(index);
-      bullet = SizedBox(width: 24.0, child: Text(bulletText, style: textStyle));
+      final bulletText = style.bulletText(index, indent);
+      bullet = SizedOverflowBox(
+          size: Size(32, 1),
+          alignment: Alignment.topRight,
+          child: Row(children: [
+            Text(
+              bulletText,
+              style:
+                  textStyle.apply(fontFeatures: [FontFeature.tabularFigures()]),
+              maxLines: 1,
+            ),
+            SizedBox(width: 8)
+          ]));
     }
 
     if (padding != null) {
@@ -117,7 +140,11 @@ class ZefyrListItem extends StatelessWidget {
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[bullet, Expanded(child: content)],
+      children: <Widget>[
+        SizedBox(width: (indent * 32).toDouble()),
+        bullet,
+        Expanded(child: content)
+      ],
     );
   }
 }
@@ -136,10 +163,28 @@ extension on NotusStyle {
 }
 
 extension on NotusAttribute {
-  String bulletText(int index) {
+  String bulletText(int index, int indent) {
     if (this == NotusAttribute.block.numberList) {
+      // a ~ z, aa ~ az, ba ~ bz ... aaa ~ aaz
+      if ((indent % 3) == 1) {
+        var chars = '';
+        chars += String.fromCharCode(0x61 + (index - 1) % 26);
+        while ((index - 1) ~/ 26 > 0) {
+          index = (index - 1) ~/ 26;
+          chars = String.fromCharCode(0x61 + (index - 1) % 26) + chars;
+        }
+        return chars + '.';
+      }
+      // i, ii, iii, iv, v, vi
+      if ((indent % 3) == 2) {
+        return index.toRomanNumeralString().toLowerCase() + '.';
+      }
+      // not allow over 1000
+      index = index % 1000;
       return '$index.';
     }
+    if ((indent % 3) == 1) return '◦';
+    if ((indent % 3) == 2) return '■';
     return '•';
   }
 }
