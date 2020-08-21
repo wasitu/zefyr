@@ -102,22 +102,28 @@ class ZefyrListItem extends StatelessWidget {
     Widget bullet;
     if (style == NotusAttribute.checkbox.checked) {
       bullet = SizedBox(
-          width: 32,
-          height: 24,
-          child: Checkbox(
-            value: true,
-            onChanged: (bool value) {},
-          ));
+          width: 32 * MediaQuery.of(context).textScaleFactor,
+          height: 24 * MediaQuery.of(context).textScaleFactor,
+          child: Transform.scale(
+              scale: 0.8 * MediaQuery.of(context).textScaleFactor,
+              child: Checkbox(
+                value: true,
+                onChanged: (bool value) {},
+              )));
     } else if (style == NotusAttribute.checkbox.unchecked) {
       bullet = SizedBox(
-          width: 32,
-          height: 24,
-          child: Checkbox(value: false, onChanged: (bool value) {}));
+          width: 32 * MediaQuery.of(context).textScaleFactor,
+          height: 24 * MediaQuery.of(context).textScaleFactor,
+          child: Transform.scale(
+              scale: 0.8 * MediaQuery.of(context).textScaleFactor,
+              child: Checkbox(value: false, onChanged: (bool value) {})));
     } else {
       final bulletText = style.bulletText(index, indent);
       bullet = SizedOverflowBox(
-          size: Size(32, 1),
-          alignment: Alignment.topRight,
+          size: Size(16 + 16 * MediaQuery.of(context).textScaleFactor, 1),
+          alignment: (style == NotusAttribute.block.bulletList)
+              ? Alignment.topCenter
+              : Alignment.topRight,
           child: Row(children: [
             Text(
               bulletText,
@@ -125,7 +131,9 @@ class ZefyrListItem extends StatelessWidget {
                   textStyle.apply(fontFeatures: [FontFeature.tabularFigures()]),
               maxLines: 1,
             ),
-            SizedBox(width: 8)
+            (style == NotusAttribute.block.bulletList)
+                ? SizedBox()
+                : SizedBox(width: 8)
           ]));
     }
 

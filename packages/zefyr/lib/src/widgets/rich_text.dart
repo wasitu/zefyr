@@ -23,11 +23,10 @@ class ZefyrRichText extends LeafRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return RenderZefyrParagraph(
-      text,
-      node: node,
-      textDirection: Directionality.of(context),
-    );
+    return RenderZefyrParagraph(text,
+        node: node,
+        textDirection: Directionality.of(context),
+        textScaleFactor: MediaQuery.of(context).textScaleFactor);
   }
 
   @override
@@ -35,7 +34,8 @@ class ZefyrRichText extends LeafRenderObjectWidget {
       BuildContext context, RenderZefyrParagraph renderObject) {
     renderObject
       ..text = text
-      ..node = node;
+      ..node = node
+      ..textScaleFactor = MediaQuery.of(context).textScaleFactor;
   }
 }
 
