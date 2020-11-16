@@ -191,8 +191,8 @@ extension on NotusAttribute {
       index = index % 1000;
       return '$index.';
     }
-    if ((indent % 3) == 1) return '◦';
+    if ((indent % 3) == 1) return '○';
     if ((indent % 3) == 2) return '■';
-    return '•';
+    return '●';
   }
 }

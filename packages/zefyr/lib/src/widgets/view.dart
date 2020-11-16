@@ -109,9 +109,9 @@ class ZefyrViewState extends State<ZefyrView> {
     if (node is CheckboxNode) {
       final style = node.style.get(NotusAttribute.checkbox);
       if (style == NotusAttribute.checkbox.checked) {
-        return ZefyrLine(node: node as LineNode);
+        return ZefyrList(node: node);
       } else if (style == NotusAttribute.checkbox.unchecked) {
-        return ZefyrLine(node: node as LineNode);
+        return ZefyrList(node: node);
       }
     }
 
