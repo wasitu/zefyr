@@ -4,6 +4,7 @@
 import 'dart:math' as math;
 
 import 'package:notus/src/document/embeds.dart';
+import 'package:notus/src/document/checkbox.dart';
 import 'package:quill_delta/quill_delta.dart';
 
 import 'attributes.dart';
@@ -309,28 +310,53 @@ class LineNode extends ContainerNode<LeafNode>
     if (newStyle == null || newStyle.isEmpty) return;
 
     applyStyle(newStyle);
-    if (!newStyle.contains(NotusAttribute.block)) {
-      return;
-    } // no block-level changes
 
-    final blockStyle = newStyle.get(NotusAttribute.block);
-    if (parent is BlockNode) {
-      final parentStyle = (parent as BlockNode).style.get(NotusAttribute.block);
-      if (blockStyle == NotusAttribute.block.unset) {
-        unwrap();
-      } else if (blockStyle != parentStyle) {
-        unwrap();
+    // block level
+    if (newStyle.contains(NotusAttribute.block)) {
+      final blockStyle = newStyle.get(NotusAttribute.block);
+      if (parent is BlockNode) {
+        final parentStyle =
+            (parent as BlockNode).style.get(NotusAttribute.block);
+        if (blockStyle == NotusAttribute.block.unset) {
+          unwrap();
+        } else if (blockStyle != parentStyle) {
+          unwrap();
+          final block = BlockNode();
+          block.applyAttribute(blockStyle);
+          wrap(block);
+          block.optimize();
+        } // else the same style, no-op.
+      } else if (blockStyle != NotusAttribute.block.unset) {
+        // Only wrap with a new block if this is not an unset
         final block = BlockNode();
         block.applyAttribute(blockStyle);
         wrap(block);
         block.optimize();
-      } // else the same style, no-op.
-    } else if (blockStyle != NotusAttribute.block.unset) {
-      // Only wrap with a new block if this is not an unset
-      final block = BlockNode();
-      block.applyAttribute(blockStyle);
-      wrap(block);
-      block.optimize();
+      }
+    }
+
+    // checkbox level
+    if (newStyle.contains(NotusAttribute.checkbox)) {
+      final style = newStyle.get(NotusAttribute.checkbox);
+      if (parent is CheckboxNode) {
+        final parentStyle =
+            (parent as CheckboxNode).style.get(NotusAttribute.checkbox);
+        if (style == NotusAttribute.checkbox.unset) {
+          unwrap();
+        } else if (style != parentStyle) {
+          unwrap();
+          final node = CheckboxNode();
+          node.applyAttribute(style);
+          wrap(node);
+          node.optimize();
+        } // else the same style, no-op.
+      } else if (style != NotusAttribute.checkbox.unset) {
+        // Only wrap with a new block if this is not an unset
+        final node = CheckboxNode();
+        node.applyAttribute(style);
+        wrap(node);
+        node.optimize();
+      }
     }
   }
 

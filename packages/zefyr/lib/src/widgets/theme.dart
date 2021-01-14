@@ -97,6 +97,12 @@ class ZefyrThemeData {
   /// Style theme for code blocks.
   final TextBlockTheme code;
 
+  /// Style theme used to render checked.
+  final TextBlockTheme checked;
+
+  /// Style theme used to render unchecked.
+  final TextBlockTheme unchecked;
+
   ZefyrThemeData({
     this.bold,
     this.italic,
@@ -110,6 +116,8 @@ class ZefyrThemeData {
     this.lists,
     this.quote,
     this.code,
+    this.checked,
+    this.unchecked,
   });
 
   factory ZefyrThemeData.fallback(BuildContext context) {
@@ -203,6 +211,16 @@ class ZefyrThemeData {
           color: Colors.grey.shade50,
           borderRadius: BorderRadius.circular(2),
         ),
+      ),
+      checked: TextBlockTheme(
+        style: baseStyle,
+        spacing: baseSpacing,
+        lineSpacing: VerticalSpacing(bottom: 6),
+      ),
+      unchecked: TextBlockTheme(
+        style: baseStyle,
+        spacing: baseSpacing,
+        lineSpacing: VerticalSpacing(bottom: 6),
       ),
     );
   }

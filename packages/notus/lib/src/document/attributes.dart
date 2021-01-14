@@ -81,6 +81,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.link.key: NotusAttribute.link,
     NotusAttribute.heading.key: NotusAttribute.heading,
     NotusAttribute.block.key: NotusAttribute.block,
+    NotusAttribute.embed.key: NotusAttribute.embed,
+    NotusAttribute.checkbox.key: NotusAttribute.checkbox,
+    NotusAttribute.indent.key: NotusAttribute.indent
   };
 
   // Inline attributes
@@ -131,6 +134,24 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
 
   /// Alias for [NotusAttribute.block.code].
   static NotusAttribute<String> get code => block.code;
+
+  /// Checkbox attribute
+  // ignore: const_eval_throws_exception
+  static const checkbox = CheckboxAttributeBuilder._();
+
+  /// Alias for [NotusAttribute.checkbox.checked].
+  static NotusAttribute<String> get checked => checkbox.checked;
+
+  /// Alias for [NotusAttribute.checkbox.unchecked].
+  static NotusAttribute<String> get unchecked => checkbox.unchecked;
+
+  /// Indent attribute
+  // ignore: const_eval_throws_exception
+  static const indent = IndentAttributeBuilder._();
+
+  /// Embed style attribute.
+  // ignore: const_eval_throws_exception
+  static const embed = EmbedAttributeBuilder._();
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
@@ -344,7 +365,8 @@ class _UnderlineAttribute extends NotusAttribute<bool> {
 
 /// Applies strikethrough style to a text segment.
 class _StrikethroughAttribute extends NotusAttribute<bool> {
-  const _StrikethroughAttribute() : super._('s', NotusAttributeScope.inline, true);
+  const _StrikethroughAttribute()
+      : super._('s', NotusAttributeScope.inline, true);
 }
 
 /// Builder for link attribute values.
@@ -402,4 +424,102 @@ class BlockAttributeBuilder extends NotusAttributeBuilder<String> {
   /// Formats a block of lines as a quote.
   NotusAttribute<String> get quote =>
       NotusAttribute<String>._(key, scope, 'quote');
+}
+
+/// Builder for checkbox attribute styles (number/bullet lists, code and quote).
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.checkbox] instead.
+class CheckboxAttributeBuilder extends NotusAttributeBuilder<String> {
+  const CheckboxAttributeBuilder._()
+      : super._('checkbox', NotusAttributeScope.line);
+
+  /// Formats a checkbox of lines as a checked
+  NotusAttribute<String> get checked =>
+      NotusAttribute<String>._(key, scope, 'checked');
+
+  /// Formats a checkbox of lines as a unchecked
+  NotusAttribute<String> get unchecked =>
+      NotusAttribute<String>._(key, scope, 'unchecked');
+}
+
+/// Builder for checkbox attribute styles (number/bullet lists, code and quote).
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.indent] instead.
+class IndentAttributeBuilder extends NotusAttributeBuilder<int> {
+  const IndentAttributeBuilder._()
+      : super._('indent', NotusAttributeScope.line);
+}
+
+class EmbedAttributeBuilder
+    extends NotusAttributeBuilder<Map<String, dynamic>> {
+  const EmbedAttributeBuilder._()
+      : super._(EmbedAttribute._kEmbed, NotusAttributeScope.inline);
+
+  NotusAttribute<Map<String, dynamic>> get horizontalRule =>
+      EmbedAttribute.horizontalRule();
+
+  NotusAttribute<Map<String, dynamic>> image(String source) =>
+      EmbedAttribute.image(source);
+
+  @override
+  NotusAttribute<Map<String, dynamic>> get unset => EmbedAttribute._(null);
+
+  @override
+  NotusAttribute<Map<String, dynamic>> withValue(Map<String, dynamic> value) =>
+      EmbedAttribute._(value);
+}
+
+/// Type of embedded content.
+enum EmbedType { horizontalRule, image }
+
+class EmbedAttribute extends NotusAttribute<Map<String, dynamic>> {
+  static const _kValueEquality = MapEquality<String, dynamic>();
+  static const _kEmbed = 'embed';
+  static const _kHorizontalRuleEmbed = 'hr';
+  static const _kImageEmbed = 'image';
+
+  EmbedAttribute._(Map<String, dynamic> value)
+      : super._(_kEmbed, NotusAttributeScope.inline, value);
+
+  EmbedAttribute.horizontalRule()
+      : this._(<String, dynamic>{'type': _kHorizontalRuleEmbed});
+
+  EmbedAttribute.image(String source)
+      : this._(<String, dynamic>{'type': _kImageEmbed, 'source': source});
+
+  /// Type of this embed.
+  EmbedType get type {
+    if (value['type'] == _kHorizontalRuleEmbed) return EmbedType.horizontalRule;
+    if (value['type'] == _kImageEmbed) return EmbedType.image;
+    assert(false, 'Unknown embed attribute value $value.');
+    return null;
+  }
+
+  @override
+  NotusAttribute<Map<String, dynamic>> get unset => EmbedAttribute._(null);
+
+  @override
+  bool operator ==(other) {
+    if (identical(this, other)) return true;
+    if (other is! EmbedAttribute) return false;
+    EmbedAttribute typedOther = other;
+    return key == typedOther.key &&
+        scope == typedOther.scope &&
+        _kValueEquality.equals(value, typedOther.value);
+  }
+
+  @override
+  int get hashCode {
+    final objects = [key, scope];
+    if (value != null) {
+      final valueHashes =
+          value.entries.map((entry) => hash2(entry.key, entry.value));
+      objects.addAll(valueHashes);
+    } else {
+      objects.add(value);
+    }
+    return hashObjects(objects);
+  }
 }

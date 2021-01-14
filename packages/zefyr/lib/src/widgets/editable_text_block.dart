@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
+import 'package:numerus/numerus.dart';
 
 import '../rendering/editable_text_block.dart';
 import 'cursor.dart';
@@ -55,15 +58,26 @@ class EditableTextBlock extends StatelessWidget {
     final theme = ZefyrTheme.of(context);
     final count = node.children.length;
     final children = <Widget>[];
+    final indexes = {0: 0};
     var index = 0;
+    var currentIndent = 0;
     for (final line in node.children) {
       index++;
+      final indent =
+          (line as LineNode)?.style?.get(NotusAttribute.indent)?.value ?? 0;
+      if (currentIndent < indent) {
+        indexes[indent] = 1;
+      } else {
+        indexes[indent] += 1;
+      }
+      currentIndent = indent;
+
       children.add(EditableTextLine(
         node: line,
         textDirection: textDirection,
         spacing: _getSpacingForLine(line, index, count, theme),
-        leading: _buildLeading(context, line, index, count),
-        indentWidth: _getIndentWidth(),
+        leading: _buildLeading(context, line, indexes[indent], count, indent),
+        indentWidth: _getIndentWidth(indent),
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
         body: TextLine(
           node: line,
@@ -81,7 +95,7 @@ class EditableTextBlock extends StatelessWidget {
   }
 
   Widget _buildLeading(
-      BuildContext context, LineNode node, int index, int count) {
+      BuildContext context, LineNode node, int index, int count, int indent) {
     final theme = ZefyrTheme.of(context);
     final block = node.style.get(NotusAttribute.block);
     if (block == NotusAttribute.block.numberList) {
@@ -91,11 +105,13 @@ class EditableTextBlock extends StatelessWidget {
         style: theme.paragraph.style,
         width: 32.0,
         padding: 8.0,
+        indent: indent,
       );
     } else if (block == NotusAttribute.block.bulletList) {
       return _BulletPoint(
         style: theme.paragraph.style.copyWith(fontWeight: FontWeight.bold),
         width: 32,
+        indent: indent,
       );
     } else if (block == NotusAttribute.block.code) {
       return _NumberPoint(
@@ -107,19 +123,41 @@ class EditableTextBlock extends StatelessWidget {
         padding: 16.0,
         withDot: false,
       );
-    } else {
-      return null;
     }
+
+    final checkbox = node.style.get(NotusAttribute.checkbox);
+    if (checkbox == NotusAttribute.checkbox.checked) {
+      return Container(
+        alignment: AlignmentDirectional.topEnd,
+        child: Checkbox(
+          value: true,
+          onChanged: (value) {},
+        ),
+        height: 24 * MediaQuery.of(context).textScaleFactor,
+        padding: EdgeInsetsDirectional.only(end: 8, start: indent * 32.0),
+      );
+    } else if (checkbox == NotusAttribute.checkbox.unchecked) {
+      return Container(
+        alignment: AlignmentDirectional.topEnd,
+        child: Checkbox(
+          value: false,
+          onChanged: (value) {},
+        ),
+        height: 24 * MediaQuery.of(context).textScaleFactor,
+        padding: EdgeInsetsDirectional.only(end: 8, start: indent * 32.0),
+      );
+    }
+    return null;
   }
 
-  double _getIndentWidth() {
+  double _getIndentWidth(int indent) {
     final block = node.style.get(NotusAttribute.block);
     if (block == NotusAttribute.block.quote) {
       return 16.0;
     } else if (block == NotusAttribute.block.code) {
       return 32.0;
     } else {
-      return 32.0;
+      return 32.0 + 32.0 * indent.toDouble();
     }
   }
 
@@ -149,6 +187,12 @@ class EditableTextBlock extends StatelessWidget {
         lineSpacing = theme.lists.lineSpacing;
       } else if (block == NotusAttribute.block.code ||
           block == NotusAttribute.block.code) {
+        lineSpacing = theme.lists.lineSpacing;
+      }
+
+      final checkbox = this.node.style.get(NotusAttribute.checkbox);
+      if (checkbox == NotusAttribute.checkbox.checked ||
+          checkbox == NotusAttribute.checkbox.unchecked) {
         lineSpacing = theme.lists.lineSpacing;
       }
       top = lineSpacing.top;
@@ -227,6 +271,7 @@ class _EditableBlock extends MultiChildRenderObjectWidget {
 class _NumberPoint extends StatelessWidget {
   final int index;
   final int count;
+  final int indent;
   final TextStyle style;
   final double width;
   final bool withDot;
@@ -238,6 +283,7 @@ class _NumberPoint extends StatelessWidget {
     @required this.count,
     @required this.style,
     @required this.width,
+    this.indent = 0,
     this.withDot = true,
     this.padding = 0.0,
   }) : super(key: key);
@@ -245,29 +291,59 @@ class _NumberPoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: AlignmentDirectional.topEnd,
-      child: Text(withDot ? '$index.' : '$index', style: style),
-      width: width,
-      padding: EdgeInsetsDirectional.only(end: padding),
+      child: Text(withDot ? '${display()}.' : '${display()}',
+          style: style.apply(fontFeatures: [FontFeature.tabularFigures()])),
+      width: width + indent * 32.0,
+      padding: EdgeInsetsDirectional.only(end: padding, start: indent * 32.0),
     );
+  }
+
+  String display() {
+    var index = this.index;
+    // a ~ z, aa ~ az, ba ~ bz ... aaa ~ aaz
+    if ((indent % 3) == 1) {
+      var chars = '';
+      chars += String.fromCharCode(0x61 + (index - 1) % 26);
+      while ((index - 1) ~/ 26 > 0) {
+        index = (index - 1) ~/ 26;
+        chars = String.fromCharCode(0x61 + (index - 1) % 26) + chars;
+      }
+      return chars;
+    }
+    // i, ii, iii, iv, v, vi
+    if ((indent % 3) == 2) {
+      return index.toRomanNumeralString().toLowerCase();
+    }
+    // not allow over 1000
+    index = index % 1000;
+    return '$index';
   }
 }
 
 class _BulletPoint extends StatelessWidget {
   final TextStyle style;
   final double width;
+  final int indent;
 
   const _BulletPoint({
     Key key,
     @required this.style,
     @required this.width,
+    this.indent = 0,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
       alignment: AlignmentDirectional.topEnd,
-      child: Text('•', style: style),
-      width: width,
-      padding: EdgeInsetsDirectional.only(end: 13.0),
+      child: Text('${display()}', style: style),
+      width: width + indent * 32.0,
+      padding: EdgeInsetsDirectional.only(end: 8, start: indent * 32.0),
     );
+  }
+
+  String display() {
+    if ((indent % 3) == 1) return '○';
+    if ((indent % 3) == 2) return '■';
+    return '●';
   }
 }
