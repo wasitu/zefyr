@@ -339,21 +339,12 @@ class LineNode extends ContainerNode<LeafNode>
     if (newStyle.contains(NotusAttribute.checkbox)) {
       final style = newStyle.get(NotusAttribute.checkbox);
       if (parent is CheckboxNode) {
-        final parentStyle =
-            (parent as CheckboxNode).style.get(NotusAttribute.checkbox);
         if (style == NotusAttribute.checkbox.unset) {
           unwrap();
-        } else if (style != parentStyle) {
-          unwrap();
-          final node = CheckboxNode();
-          node.applyAttribute(style);
-          wrap(node);
-          node.optimize();
-        } // else the same style, no-op.
+        }
       } else if (style != NotusAttribute.checkbox.unset) {
         // Only wrap with a new block if this is not an unset
         final node = CheckboxNode();
-        node.applyAttribute(style);
         wrap(node);
         node.optimize();
       }

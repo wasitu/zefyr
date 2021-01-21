@@ -191,8 +191,7 @@ class EditableTextBlock extends StatelessWidget {
       }
 
       final checkbox = this.node.style.get(NotusAttribute.checkbox);
-      if (checkbox == NotusAttribute.checkbox.checked ||
-          checkbox == NotusAttribute.checkbox.unchecked) {
+      if (this.node is CheckboxNode) {
         lineSpacing = theme.lists.lineSpacing;
       }
       top = lineSpacing.top;
