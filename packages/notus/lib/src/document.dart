@@ -229,7 +229,8 @@ class NotusDocument {
   void compose(Delta change, ChangeSource source) {
     _checkMutable();
     change.trim();
-    assert(change.isNotEmpty);
+    if (change.isEmpty) return;
+    // assert(change.isNotEmpty);
 
     var offset = 0;
     final before = toDelta();
