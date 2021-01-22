@@ -78,7 +78,7 @@ class CursorPainter {
 
     caretRect = caretRect.shift(
         _getPixelPerfectCursorOffset(editable, caretRect, devicePixelRatio));
-
+    if (caretRect.hasNaN) return;
     if (style.radius == null) {
       canvas.drawRect(caretRect, paint);
     } else {
