@@ -158,18 +158,21 @@ class ZefyrController extends ChangeNotifier {
     }
     if (selection != null) {
       _updateSelectionSilent(selection, source: source);
-    } else {
-      // Transform selection against the composed change and give priority to
-      // current position (force: false).
-      final base =
-          change.transformPosition(_selection.baseOffset, force: false);
-      final extent =
-          change.transformPosition(_selection.extentOffset, force: false);
-      selection = _selection.copyWith(baseOffset: base, extentOffset: extent);
-      if (_selection != selection) {
-        _updateSelectionSilent(selection, source: source);
-      }
     }
+    // prevent moving cursor from remote update
+    //
+    // else {
+    //   // Transform selection against the composed change and give priority to
+    //   // current position (force: false).
+    //   final base =
+    //       change.transformPosition(_selection.baseOffset, force: false);
+    //   final extent =
+    //       change.transformPosition(_selection.extentOffset, force: false);
+    //   selection = _selection.copyWith(baseOffset: base, extentOffset: extent);
+    //   if (_selection != selection) {
+    //     _updateSelectionSilent(selection, source: source);
+    //   }
+    // }
     notifyListeners();
   }
 

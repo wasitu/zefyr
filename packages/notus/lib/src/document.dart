@@ -245,7 +245,7 @@ class NotusDocument {
         _root.insert(offset, data, attributes);
       } else if (op.isDelete) {
         _root.delete(offset, op.length);
-      } else if (op.attributes != null) {
+      } else if (op.isRetain) {
         _root.retain(offset, op.length, attributes);
       }
       if (!op.isDelete) offset += op.length;

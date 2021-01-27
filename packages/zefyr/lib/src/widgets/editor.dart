@@ -898,6 +898,7 @@ class RawEditorState extends EditorState
   }
 
   void _didChangeTextEditingValue() {
+    if (!_hasFocus) return;
     requestKeyboard();
 
     _showCaretOnScreen();
