@@ -265,7 +265,6 @@ class LineNode extends ContainerNode<LeafNode>
 
   @override
   void delete(int index, int length) {
-    if (index >= length) return;
     final local = math.min(this.length - index, length);
     final isLFDeleted = (index + local == this.length);
     if (isLFDeleted) {

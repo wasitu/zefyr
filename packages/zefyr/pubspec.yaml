@@ -20,11 +20,11 @@ dependencies:
   numerus: ^1.0.3
 
   notus:
-    # path: ../notus
-    git:
-      url: https://github.com/wasitu/zefyr.git
-      ref: w3
-      path: packages/notus
+    path: ../notus
+    # git:
+    #   url: https://github.com/wasitu/zefyr.git
+    #   ref: w3
+    #   path: packages/notus
 
 dev_dependencies:
   flutter_test:
