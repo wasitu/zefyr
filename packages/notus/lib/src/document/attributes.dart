@@ -83,7 +83,9 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
     NotusAttribute.checkbox.key: NotusAttribute.checkbox,
-    NotusAttribute.indent.key: NotusAttribute.indent
+    NotusAttribute.indent.key: NotusAttribute.indent,
+    NotusAttribute.id.key: NotusAttribute.id,
+    NotusAttribute.timestamp.key: NotusAttribute.timestamp,
   };
 
   // Inline attributes
@@ -149,14 +151,23 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   // ignore: const_eval_throws_exception
   static const indent = IndentAttributeBuilder._();
 
+  /// ID attribute
+  // ignore: const_eval_throws_exception
+  static const id = IdAttributeBuilder._();
+
+  /// Timestamp attribute
+  // ignore: const_eval_throws_exception
+  static const timestamp = TimestampAttributeBuilder._();
+
   /// Embed style attribute.
   // ignore: const_eval_throws_exception
   static const embed = EmbedAttributeBuilder._();
 
   static NotusAttribute _fromKeyValue(String key, dynamic value) {
     if (!_registry.containsKey(key)) {
-      throw ArgumentError.value(
-          key, 'No attribute with key "$key" registered.');
+      return null;
+      // throw ArgumentError.value(
+      //     key, 'No attribute with key "$key" registered.');
     }
     final builder = _registry[key];
     return builder.withValue(value);
@@ -233,6 +244,7 @@ class NotusStyle {
       var attr = NotusAttribute._fromKeyValue(key, value);
       return MapEntry<String, NotusAttribute>(key, attr);
     });
+    result.removeWhere((key, value) => value == null);
     return NotusStyle._(result);
   }
 
@@ -443,13 +455,30 @@ class CheckboxAttributeBuilder extends NotusAttributeBuilder<String> {
       NotusAttribute<String>._(key, scope, 'unchecked');
 }
 
-/// Builder for checkbox attribute styles (number/bullet lists, code and quote).
+/// Builder for indent attribute styles.
 ///
 /// There is no need to use this class directly, consider using
 /// [NotusAttribute.indent] instead.
 class IndentAttributeBuilder extends NotusAttributeBuilder<int> {
   const IndentAttributeBuilder._()
       : super._('indent', NotusAttributeScope.line);
+}
+
+/// Builder for id attribute styles.
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.heading] instead.
+class IdAttributeBuilder extends NotusAttributeBuilder<String> {
+  const IdAttributeBuilder._() : super._('id', NotusAttributeScope.line);
+}
+
+/// Builder for timestamp attribute styles.
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.heading] instead.
+class TimestampAttributeBuilder extends NotusAttributeBuilder<String> {
+  const TimestampAttributeBuilder._()
+      : super._('timestamp', NotusAttributeScope.line);
 }
 
 class EmbedAttributeBuilder
