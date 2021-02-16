@@ -172,12 +172,15 @@ class ToggleStyleButton extends StatefulWidget {
   /// Builder function to customize visual representation of this button.
   final ToggleStyleButtonBuilder childBuilder;
 
+  final bool Function(NotusAttribute) isToggled;
+
   ToggleStyleButton({
     Key key,
     @required this.attribute,
     @required this.icon,
     @required this.controller,
     this.childBuilder = defaultToggleStyleButtonBuilder,
+    this.isToggled,
   })  : assert(!attribute.isUnset),
         assert(icon != null),
         assert(controller != null),
@@ -195,15 +198,18 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
 
   void _didChangeEditingValue() {
     setState(() {
-      _isToggled =
-          widget.controller.getSelectionStyle().containsSame(widget.attribute);
+      _isToggled = widget.isToggled != null
+          ? widget.isToggled(_selectionStyle.get(NotusAttribute.checkbox))
+          : _selectionStyle.containsSame(widget.attribute);
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _isToggled = _selectionStyle.containsSame(widget.attribute);
+    _isToggled = widget.isToggled != null
+        ? widget.isToggled(_selectionStyle.get(NotusAttribute.checkbox))
+        : _selectionStyle.containsSame(widget.attribute);
     widget.controller.addListener(_didChangeEditingValue);
   }
 
@@ -213,7 +219,9 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
-      _isToggled = _selectionStyle.containsSame(widget.attribute);
+      _isToggled = widget.isToggled != null
+          ? widget.isToggled(_selectionStyle.get(NotusAttribute.checkbox))
+          : _selectionStyle.containsSame(widget.attribute);
     }
   }
 
@@ -386,7 +394,20 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
 
   const ZefyrToolbar({Key key, @required this.children}) : super(key: key);
 
-  factory ZefyrToolbar.basic({Key key, @required ZefyrController controller, bool hideBoldButton=false, bool hideItalicButton=false, bool hideUnderLineButton=false, bool hideStrikeThrough=false, bool hideHeadingStyle=false, bool hideListNumbers=false, bool hideListBullets=false, bool hideCodeBlock=false, bool hideQuote=false, bool hideLink=false, bool hideHorizontalRule=false}) {
+  factory ZefyrToolbar.basic(
+      {Key key,
+      @required ZefyrController controller,
+      bool hideBoldButton = false,
+      bool hideItalicButton = false,
+      bool hideUnderLineButton = false,
+      bool hideStrikeThrough = false,
+      bool hideHeadingStyle = false,
+      bool hideListNumbers = false,
+      bool hideListBullets = false,
+      bool hideCodeBlock = false,
+      bool hideQuote = false,
+      bool hideLink = false,
+      bool hideHorizontalRule = false}) {
     return ZefyrToolbar(key: key, children: [
       Visibility(
         visible: hideBoldButton,
@@ -423,8 +444,13 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           controller: controller,
         ),
       ),
-      Visibility(visible: hideHeadingStyle, child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
-      Visibility(visible: hideHeadingStyle, child: SelectHeadingStyleButton(controller: controller)),
+      Visibility(
+          visible: hideHeadingStyle,
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(
+          visible: hideHeadingStyle,
+          child: SelectHeadingStyleButton(controller: controller)),
       VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400),
       Visibility(
         visible: hideListNumbers,
@@ -452,7 +478,8 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
       ),
       Visibility(
           visible: !hideListNumbers && !hideListBullets && !hideCodeBlock,
-          child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
       Visibility(
         visible: hideQuote,
         child: ToggleStyleButton(
@@ -461,8 +488,12 @@ class ZefyrToolbar extends StatefulWidget implements PreferredSizeWidget {
           icon: Icons.format_quote,
         ),
       ),
-      Visibility(visible: hideQuote, child: VerticalDivider(indent: 16, endIndent: 16, color: Colors.grey.shade400)),
-      Visibility(visible: hideLink, child: LinkStyleButton(controller: controller)),
+      Visibility(
+          visible: hideQuote,
+          child: VerticalDivider(
+              indent: 16, endIndent: 16, color: Colors.grey.shade400)),
+      Visibility(
+          visible: hideLink, child: LinkStyleButton(controller: controller)),
       Visibility(
         visible: hideHorizontalRule,
         child: InsertEmbedButton(

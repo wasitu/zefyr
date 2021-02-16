@@ -385,6 +385,19 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     }
   }
 
+  void _handleComponent(TapUpDetails details) {
+    final pos = renderEditor.getPositionForOffset(details.globalPosition);
+    final result = editor.widget.controller.document.lookupLine(pos.offset);
+    if (result.node == null || result.offset != 0) return;
+    final line = result.node as LineNode;
+
+    // switch checkbox
+    if (line.style.containsSame(NotusAttribute.unchecked))
+      editor.widget.controller.formatSelection(NotusAttribute.checked);
+    else if (line.style.containsSame(NotusAttribute.checked))
+      editor.widget.controller.formatSelection(NotusAttribute.unchecked);
+  }
+
   @override
   void onSingleTapUp(TapUpDetails details) {
     editor.hideToolbar();
@@ -421,7 +434,9 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     }
     _state._requestKeyboard();
     // if (_state.widget.onTap != null)
-    //   _state.widget.onTap();
+    // _state.widget.onTap();
+    //
+    _handleComponent(details);
   }
 
   @override

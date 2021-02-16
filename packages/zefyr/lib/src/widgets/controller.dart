@@ -132,6 +132,20 @@ class ZefyrController extends ChangeNotifier {
   void formatSelection(NotusAttribute attribute) {
     final index = _selection.start;
     final length = _selection.end - index;
+    if ([
+      NotusAttribute.heading.key,
+      NotusAttribute.checkbox.key,
+      NotusAttribute.block.key
+    ].contains(attribute.key)) {
+      // unset
+      if (getSelectionStyle().contains(NotusAttribute.block))
+        formatText(index, length, NotusAttribute.block.unset);
+      if (getSelectionStyle().contains(NotusAttribute.heading))
+        formatText(index, length, NotusAttribute.heading.unset);
+      if (getSelectionStyle().contains(NotusAttribute.checkbox))
+        formatText(index, length, NotusAttribute.checkbox.unset);
+    }
+
     formatText(index, length, attribute);
   }
 

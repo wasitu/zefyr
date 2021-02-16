@@ -131,7 +131,9 @@ class EditableTextBlock extends StatelessWidget {
         alignment: AlignmentDirectional.topEnd,
         child: Checkbox(
           value: true,
-          onChanged: (value) {},
+          onChanged: (value) {
+            // src/widgets/editor.dart :: _handleComponent
+          },
         ),
         height: 24 * MediaQuery.of(context).textScaleFactor,
         padding: EdgeInsetsDirectional.only(end: 8, start: indent * 32.0),
@@ -141,7 +143,9 @@ class EditableTextBlock extends StatelessWidget {
         alignment: AlignmentDirectional.topEnd,
         child: Checkbox(
           value: false,
-          onChanged: (value) {},
+          onChanged: (value) {
+            // src/widgets/editor.dart :: _handleComponent
+          },
         ),
         height: 24 * MediaQuery.of(context).textScaleFactor,
         padding: EdgeInsetsDirectional.only(end: 8, start: indent * 32.0),
