@@ -177,12 +177,11 @@ class ToggleStyleButton extends StatefulWidget {
   ToggleStyleButton({
     Key key,
     @required this.attribute,
-    @required this.icon,
     @required this.controller,
+    this.icon,
     this.childBuilder = defaultToggleStyleButtonBuilder,
     this.isToggled,
   })  : assert(!attribute.isUnset),
-        assert(icon != null),
         assert(controller != null),
         assert(childBuilder != null),
         super(key: key);
