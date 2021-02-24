@@ -39,23 +39,23 @@ class NotusChange {
 /// A rich text document.
 class NotusDocument {
   /// Creates new empty Notus document.
-  NotusDocument()
-      : _heuristics = NotusHeuristics.fallback,
+  NotusDocument({NotusHeuristics heuristics})
+      : _heuristics = heuristics ?? NotusHeuristics.fallback,
         _delta = Delta()..insert('\n') {
     _loadDocument(_delta);
   }
 
   /// Creates new NotusDocument from provided JSON `data`.
-  NotusDocument.fromJson(List data)
-      : _heuristics = NotusHeuristics.fallback,
+  NotusDocument.fromJson(List data, {NotusHeuristics heuristics})
+      : _heuristics = heuristics ?? NotusHeuristics.fallback,
         _delta = _migrateDelta(Delta.fromJson(data)) {
     _loadDocument(_delta);
   }
 
   /// Creates new NotusDocument from provided `delta`.
-  NotusDocument.fromDelta(Delta delta)
+  NotusDocument.fromDelta(Delta delta, {NotusHeuristics heuristics})
       : assert(delta != null),
-        _heuristics = NotusHeuristics.fallback,
+        _heuristics = heuristics ?? NotusHeuristics.fallback,
         _delta = _migrateDelta(delta) {
     _loadDocument(_delta);
   }

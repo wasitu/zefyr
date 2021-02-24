@@ -67,7 +67,9 @@ class NotusHeuristics {
     final delta = document.toDelta();
     for (var rule in insertRules) {
       final result = rule.apply(delta, index, data);
-      if (result != null) return result..trim();
+      if (result != null) {
+        return result..trim();
+      }
     }
     throw StateError('Failed to apply insert heuristic rules: none applied.');
   }
