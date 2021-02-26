@@ -39,28 +39,34 @@ class NotusChange {
 /// A rich text document.
 class NotusDocument {
   /// Creates new empty Notus document.
-  NotusDocument({NotusHeuristics heuristics})
-      : _heuristics = heuristics ?? NotusHeuristics.fallback,
+  NotusDocument()
+      : _heuristics = NotusHeuristics.fallback,
+        _callbacks = {},
         _delta = Delta()..insert('\n') {
     _loadDocument(_delta);
   }
 
   /// Creates new NotusDocument from provided JSON `data`.
-  NotusDocument.fromJson(List data, {NotusHeuristics heuristics})
+  NotusDocument.fromJson(List data,
+      {NotusHeuristics heuristics, Map<String, dynamic> callbacks})
       : _heuristics = heuristics ?? NotusHeuristics.fallback,
+        _callbacks = callbacks ?? {},
         _delta = _migrateDelta(Delta.fromJson(data)) {
     _loadDocument(_delta);
   }
 
   /// Creates new NotusDocument from provided `delta`.
-  NotusDocument.fromDelta(Delta delta, {NotusHeuristics heuristics})
+  NotusDocument.fromDelta(Delta delta,
+      {NotusHeuristics heuristics, Map<String, dynamic> callbacks})
       : assert(delta != null),
         _heuristics = heuristics ?? NotusHeuristics.fallback,
+        _callbacks = callbacks ?? {},
         _delta = _migrateDelta(delta) {
     _loadDocument(_delta);
   }
 
   final NotusHeuristics _heuristics;
+  final Map<String, dynamic> _callbacks;
 
   /// The root node of this document tree.
   RootNode get root => _root;
@@ -117,6 +123,10 @@ class NotusDocument {
 
     final change = _heuristics.applyInsertRules(this, index, data);
     compose(change, ChangeSource.local);
+    if (_callbacks['onInsert'] != null) {
+      final style = (this.lookupLine(index).node as StyledNode)?.style;
+      _callbacks['onInsert'](index, style);
+    }
     return change;
   }
 
@@ -133,6 +143,10 @@ class NotusDocument {
     if (change.isNotEmpty) {
       // Delete rules are allowed to prevent the edit so it may be empty.
       compose(change, ChangeSource.local);
+    }
+    if (_callbacks['onDelete'] != null) {
+      final style = (this.lookupLine(index).node as StyledNode)?.style;
+      _callbacks['onDelete'](index, style);
     }
     return change;
   }
@@ -186,7 +200,8 @@ class NotusDocument {
       compose(formatChange, ChangeSource.local);
       change = change.compose(formatChange);
     }
-
+    if (_callbacks['onFormat'] != null)
+      _callbacks['onFormat'](index, attribute);
     return change;
   }
 

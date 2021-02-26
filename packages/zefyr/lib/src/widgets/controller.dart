@@ -14,8 +14,8 @@ List<String> _insertionToggleableStyleKeys = [
 ];
 
 class ZefyrController extends ChangeNotifier {
-  ZefyrController([NotusDocument document])
-      : document = document ?? NotusDocument(),
+  ZefyrController({NotusDocument document})
+      : this.document = document ?? NotusDocument(),
         _selection = TextSelection.collapsed(offset: 0);
 
   /// Document managed by this controller.
@@ -132,11 +132,12 @@ class ZefyrController extends ChangeNotifier {
   void formatSelection(NotusAttribute attribute) {
     final index = _selection.start;
     final length = _selection.end - index;
-    if ([
-      NotusAttribute.heading.key,
-      NotusAttribute.checkbox.key,
-      NotusAttribute.block.key
-    ].contains(attribute.key)) {
+    if (attribute.value != null &&
+        [
+          NotusAttribute.heading.key,
+          NotusAttribute.checkbox.key,
+          NotusAttribute.block.key
+        ].contains(attribute.key)) {
       // unset
       if (getSelectionStyle().contains(NotusAttribute.block))
         formatText(index, length, NotusAttribute.block.unset);

@@ -172,7 +172,7 @@ class ToggleStyleButton extends StatefulWidget {
   /// Builder function to customize visual representation of this button.
   final ToggleStyleButtonBuilder childBuilder;
 
-  final bool Function(NotusAttribute) isToggled;
+  final bool Function(NotusStyle) isToggled;
 
   ToggleStyleButton({
     Key key,
@@ -198,7 +198,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   void _didChangeEditingValue() {
     setState(() {
       _isToggled = widget.isToggled != null
-          ? widget.isToggled(_selectionStyle.get(NotusAttribute.checkbox))
+          ? widget.isToggled(_selectionStyle)
           : _selectionStyle.containsSame(widget.attribute);
     });
   }
@@ -207,7 +207,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   void initState() {
     super.initState();
     _isToggled = widget.isToggled != null
-        ? widget.isToggled(_selectionStyle.get(NotusAttribute.checkbox))
+        ? widget.isToggled(_selectionStyle)
         : _selectionStyle.containsSame(widget.attribute);
     widget.controller.addListener(_didChangeEditingValue);
   }
@@ -219,7 +219,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
       _isToggled = widget.isToggled != null
-          ? widget.isToggled(_selectionStyle.get(NotusAttribute.checkbox))
+          ? widget.isToggled(_selectionStyle)
           : _selectionStyle.containsSame(widget.attribute);
     }
   }
