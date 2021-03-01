@@ -7,37 +7,37 @@ import 'package:quill_delta/quill_delta.dart';
 import '../document/attributes.dart';
 
 /// The result of [_findNextNewline] function.
-class _FindResult {
+class FindResult {
   /// The operation containing a newline character, can be null.
   final Operation op;
 
   /// Total length of skipped characters before [op].
   final int skippedLength;
 
-  _FindResult(this.op, this.skippedLength);
+  FindResult(this.op, this.skippedLength);
 
   /// If true then no operation containing newline was found.
   bool get isEmpty => op == null;
 
   /// If false then no operation containing newline was found.
   bool get isNotEmpty => op != null;
-}
 
-/// Finds closest operation containing a newline character from current
-/// position of [iterator].
-_FindResult _findNextNewline(DeltaIterator iterator) {
-  var skipped = 0;
-  while (iterator.hasNext) {
-    final op = iterator.next();
-    final opText = op.data is String ? op.data as String : '';
-    final lf = opText.indexOf('\n');
-    if (lf >= 0) {
-      return _FindResult(op, skipped);
-    } else {
-      skipped += op.length;
+  /// Finds closest operation containing a newline character from current
+  /// position of [iterator].
+  static FindResult findNextNewline(DeltaIterator iterator) {
+    var skipped = 0;
+    while (iterator.hasNext) {
+      final op = iterator.next();
+      final opText = op.data is String ? op.data as String : '';
+      final lf = opText.indexOf('\n');
+      if (lf >= 0) {
+        return FindResult(op, skipped);
+      } else {
+        skipped += op.length;
+      }
     }
+    return FindResult(null, null);
   }
-  return _FindResult(null, null);
 }
 
 /// A heuristic rule for insert operations.
@@ -104,7 +104,7 @@ class PreserveLineStyleOnSplitRule extends InsertRule {
       return result;
     }
     // Continue looking for a newline.
-    final nextNewline = _findNextNewline(iter);
+    final nextNewline = FindResult.findNextNewline(iter);
     final attributes = nextNewline?.op?.attributes;
 
     return result..insert('\n', attributes);
@@ -144,6 +144,9 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
       if (target.attributes != null &&
           target.attributes.containsKey(NotusAttribute.id.key)) {
         resetStyle[NotusAttribute.id.key] = null;
+      }
+      if (target.attributes != null &&
+          target.attributes.containsKey(NotusAttribute.timestamp.key)) {
         resetStyle[NotusAttribute.timestamp.key] = null;
       }
       return Delta()
@@ -207,7 +210,7 @@ class AutoExitBlockRule extends InsertRule {
 
     // Keep looking for the next newline character to see if it shares the same
     // block style as `target`.
-    final nextNewline = _findNextNewline(iter);
+    final nextNewline = FindResult.findNextNewline(iter);
     if (nextNewline.isNotEmpty &&
         nextNewline.op.attributes != null &&
         nextNewline.op.attributes[NotusAttribute.block.key] == blockStyle) {
@@ -396,7 +399,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
     iter.skip(index);
 
     // Look for the next newline.
-    final nextNewline = _findNextNewline(iter);
+    final nextNewline = FindResult.findNextNewline(iter);
     final lineStyle = nextNewline.op?.attributes ?? <String, dynamic>{};
 
     // Are we currently in a block? If not then ignore.
@@ -416,6 +419,9 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
 
     if (lineStyle.containsKey(NotusAttribute.id.key)) {
       resetStyle[NotusAttribute.id.key] = null;
+    }
+
+    if (lineStyle.containsKey(NotusAttribute.timestamp.key)) {
       resetStyle[NotusAttribute.timestamp.key] = null;
     }
 
