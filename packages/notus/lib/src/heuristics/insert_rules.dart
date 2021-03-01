@@ -136,18 +136,10 @@ class ResetLineFormatOnNewLineRule extends InsertRule {
     final targetText = target.data as String;
 
     if (targetText.startsWith('\n')) {
-      Map<String, dynamic> resetStyle = {};
+      Map<String, dynamic> resetStyle;
       if (target.attributes != null &&
           target.attributes.containsKey(NotusAttribute.heading.key)) {
-        resetStyle[NotusAttribute.heading.key] = null;
-      }
-      if (target.attributes != null &&
-          target.attributes.containsKey(NotusAttribute.id.key)) {
-        resetStyle[NotusAttribute.id.key] = null;
-      }
-      if (target.attributes != null &&
-          target.attributes.containsKey(NotusAttribute.timestamp.key)) {
-        resetStyle[NotusAttribute.timestamp.key] = null;
+        resetStyle = NotusAttribute.heading.unset.toJson();
       }
       return Delta()
         ..retain(index)
@@ -409,20 +401,12 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
       NotusAttribute.block.key: lineStyle[NotusAttribute.block.key]
     };
 
-    Map<String, dynamic> resetStyle = {};
+    Map<String, dynamic> resetStyle;
     // If current line had heading style applied to it we'll need to move this
     // style to the newly inserted line before it and reset style of the
     // original line.
     if (lineStyle.containsKey(NotusAttribute.heading.key)) {
-      resetStyle[NotusAttribute.heading.key] = null;
-    }
-
-    if (lineStyle.containsKey(NotusAttribute.id.key)) {
-      resetStyle[NotusAttribute.id.key] = null;
-    }
-
-    if (lineStyle.containsKey(NotusAttribute.timestamp.key)) {
-      resetStyle[NotusAttribute.timestamp.key] = null;
+      resetStyle = NotusAttribute.heading.unset.toJson();
     }
 
     // Go over each inserted line and ensure block style is applied.
@@ -443,7 +427,7 @@ class PreserveBlockStyleOnInsertRule extends InsertRule {
     }
 
     // Reset style of the original newline character if needed.
-    if (resetStyle.isNotEmpty) {
+    if (resetStyle != null) {
       result.retain(nextNewline.skippedLength);
       final opText = nextNewline.op.data as String;
       final lf = opText.indexOf('\n');
