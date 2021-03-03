@@ -266,7 +266,7 @@ class LineNode extends ContainerNode<LeafNode>
   @override
   void delete(int index, int length) {
     final local = math.min(this.length - index, length);
-    final isLFDeleted = (index + local == this.length);
+    final isLFDeleted = (index + local) == this.length;
     if (isLFDeleted) {
       // Our newline character deleted with all style information.
       clearStyle();
