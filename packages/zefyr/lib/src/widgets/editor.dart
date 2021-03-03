@@ -10,6 +10,9 @@ import 'package:notus/notus.dart';
 import 'package:zefyr/src/widgets/baseline_proxy.dart';
 
 import '../rendering/editor.dart';
+import '../rendering/editable_box.dart';
+import '../rendering/editable_text_block.dart';
+import '../rendering/editable_text_line.dart';
 import '../services/keyboard.dart';
 import 'controller.dart';
 import 'cursor.dart';
@@ -386,12 +389,28 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   }
 
   void _handleComponent(TapUpDetails details) {
+    // Check if leading is touched
+    final localOffset = renderEditor.globalToLocal(details.globalPosition);
+    RenderEditableBox editableBox = renderEditor.childAtOffset(localOffset);
+    RenderEditableTextLine child;
+    if (editableBox is RenderEditableTextBlock) {
+      final editableOffset = editableBox.globalToLocal(details.globalPosition);
+      child = editableBox.childAtOffset(editableOffset);
+    }
+    if (editableBox is RenderEditableTextLine) {
+      child = editableBox;
+    }
+    if (child == null) return;
+    final childOffset = child.globalToLocal(details.globalPosition);
+    if (!(child.children[TextLineSlot.leading]?.paintBounds
+            ?.contains(childOffset) ??
+        false)) return;
+    // Check component nodes
     final pos = renderEditor.getPositionForOffset(details.globalPosition);
     final result = editor.widget.controller.document.lookupLine(pos.offset);
-    if (result.node == null || result.offset != 0) return;
     final line = result.node as LineNode;
 
-    // switch checkbox
+    // If checkbox, change format
     if (line.style.containsSame(NotusAttribute.unchecked))
       editor.widget.controller.formatSelection(NotusAttribute.checked);
     else if (line.style.containsSame(NotusAttribute.checked))

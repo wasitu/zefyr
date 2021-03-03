@@ -23,7 +23,7 @@ dependencies:
     # path: ../notus
     git:
       url: https://github.com/wasitu/zefyr.git
-      ref: w5
+      ref: w6
       path: packages/notus
 
 dev_dependencies:
