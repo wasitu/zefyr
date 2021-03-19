@@ -1,10 +1,7 @@
 import 'dart:collection';
 
-import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
 import 'package:quiver_hashcode/hashcode.dart';
-
-const _dataEquality = DeepCollectionEquality();
+import 'package:flutter/foundation.dart';
 
 /// An object which can be embedded into a Notus document.
 ///
@@ -61,7 +58,7 @@ class EmbeddableObject {
     final typedOther = other as EmbeddableObject;
     return typedOther.type == type &&
         typedOther.inline == inline &&
-        _dataEquality.equals(typedOther._data, _data);
+        mapEquals(typedOther._data, _data);
   }
 
   @override

@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.14.6
-  url_launcher: ^5.0.0
+  url_launcher: ^6.0.0
   quill_delta: ^2.0.0
   # notus: ^1.0.0-dev
   meta: ^1.1.0
@@ -23,7 +23,7 @@ dependencies:
     # path: ../notus
     git:
       url: https://github.com/wasitu/zefyr.git
-      ref: w6
+      ref: w7
       path: packages/notus
 
 dev_dependencies:

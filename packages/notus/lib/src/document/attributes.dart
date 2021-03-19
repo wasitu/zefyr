@@ -1,7 +1,7 @@
 // Copyright (c) 2018, the Zefyr project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:quiver_hashcode/hashcode.dart';
 
 /// Scope of a style attribute, defines context in which an attribute can be
@@ -346,8 +346,7 @@ class NotusStyle {
     if (identical(this, other)) return true;
     if (other is! NotusStyle) return false;
     NotusStyle typedOther = other;
-    final eq = const MapEquality<String, NotusAttribute>();
-    return eq.equals(_data, typedOther._data);
+    return mapEquals(_data, typedOther._data);
   }
 
   @override
@@ -504,7 +503,6 @@ class EmbedAttributeBuilder
 enum EmbedType { horizontalRule, image }
 
 class EmbedAttribute extends NotusAttribute<Map<String, dynamic>> {
-  static const _kValueEquality = MapEquality<String, dynamic>();
   static const _kEmbed = 'embed';
   static const _kHorizontalRuleEmbed = 'hr';
   static const _kImageEmbed = 'image';
@@ -536,7 +534,7 @@ class EmbedAttribute extends NotusAttribute<Map<String, dynamic>> {
     EmbedAttribute typedOther = other;
     return key == typedOther.key &&
         scope == typedOther.scope &&
-        _kValueEquality.equals(value, typedOther.value);
+        mapEquals(value, typedOther.value);
   }
 
   @override

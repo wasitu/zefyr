@@ -8,6 +8,8 @@ environment:
   sdk: '>=2.9.0 <3.0.0'
 
 dependencies:
+  flutter:
+    sdk: flutter
   collection: ^1.14.6
   meta: ^1.1.0
   quill_delta: ^2.0.0
