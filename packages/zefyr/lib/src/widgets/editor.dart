@@ -1213,6 +1213,7 @@ class RawEditorState extends EditorState
   void userUpdateTextEditingValue(
       TextEditingValue value, SelectionChangedCause cause) {
     // TODO: implement userUpdateTextEditingValue
+    renderEditor.onSelectionChanged(value.selection, cause);
   }
 }
 
