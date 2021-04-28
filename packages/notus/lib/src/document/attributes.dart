@@ -241,7 +241,11 @@ class NotusStyle {
     if (data == null) return NotusStyle();
 
     final result = data.map((String key, dynamic value) {
-      var attr = NotusAttribute._fromKeyValue(key, value);
+      var converted = value;
+      if (key == NotusAttribute.timestamp.key && value is String) {
+        converted = int.tryParse(value) ?? 0;
+      }
+      var attr = NotusAttribute._fromKeyValue(key, converted);
       return MapEntry<String, NotusAttribute>(key, attr);
     });
     result.removeWhere((key, value) => value == null);
@@ -475,7 +479,7 @@ class IdAttributeBuilder extends NotusAttributeBuilder<String> {
 ///
 /// There is no need to use this class directly, consider using
 /// [NotusAttribute.heading] instead.
-class TimestampAttributeBuilder extends NotusAttributeBuilder<String> {
+class TimestampAttributeBuilder extends NotusAttributeBuilder<int> {
   const TimestampAttributeBuilder._()
       : super._('timestamp', NotusAttributeScope.line);
 }
