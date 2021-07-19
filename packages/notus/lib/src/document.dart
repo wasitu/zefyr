@@ -11,6 +11,7 @@ import 'document/embeds.dart';
 import 'document/line.dart';
 import 'document/node.dart';
 import 'document/checkbox.dart';
+import 'document/decision.dart';
 import 'heuristics.dart';
 
 /// Source of a [NotusChange].
@@ -67,6 +68,7 @@ class NotusDocument {
 
   final NotusHeuristics _heuristics;
   final Map<String, dynamic> _callbacks;
+  Map<String, dynamic> get callbacks => _callbacks;
 
   /// The root node of this document tree.
   RootNode get root => _root;
@@ -346,6 +348,7 @@ class NotusDocument {
     if (node is LineNode &&
         node.parent is! BlockNode &&
         node.parent is! CheckboxNode &&
+        node.parent is! DecisionNode &&
         node.style.isEmpty &&
         _root.childCount > 1) {
       _root.remove(node);

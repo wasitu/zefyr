@@ -389,9 +389,10 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
   }
 
   void _handleComponent(TapUpDetails details) {
+    if (editor.widget.readOnly) return;
     // Check if leading is touched
     final localOffset = renderEditor.globalToLocal(details.globalPosition);
-    RenderEditableBox editableBox = renderEditor.childAtOffset(localOffset);
+    final editableBox = renderEditor.childAtOffset(localOffset);
     RenderEditableTextLine child;
     if (editableBox is RenderEditableTextBlock) {
       final editableOffset = editableBox.globalToLocal(details.globalPosition);
@@ -411,10 +412,11 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
     final line = result.node as LineNode;
 
     // If checkbox, change format
-    if (line.style.containsSame(NotusAttribute.unchecked))
+    if (line.style.containsSame(NotusAttribute.unchecked)) {
       editor.widget.controller.formatSelection(NotusAttribute.checked);
-    else if (line.style.containsSame(NotusAttribute.checked))
+    } else if (line.style.containsSame(NotusAttribute.checked)) {
       editor.widget.controller.formatSelection(NotusAttribute.unchecked);
+    }
   }
 
   @override
@@ -452,9 +454,8 @@ class _ZefyrEditorSelectionGestureDetectorBuilder
       }
     }
     _state._requestKeyboard();
-    // if (_state.widget.onTap != null)
-    // _state.widget.onTap();
-    //
+    // if (_state.widget.onTap != null) _state.widget.onTap();
+
     _handleComponent(details);
   }
 
@@ -1177,6 +1178,7 @@ class RawEditorState extends EditorState
               ? EdgeInsets.all(16.0)
               : null,
           embedBuilder: widget.embedBuilder,
+          controller: widget.controller,
         ));
       } else {
         throw StateError('Unreachable.');
@@ -1199,14 +1201,26 @@ class RawEditorState extends EditorState
   }
 
   VerticalSpacing _getSpacingForBlock(BlockNode node, ZefyrThemeData theme) {
-    final style = node.style.get(NotusAttribute.block);
-    if (style == NotusAttribute.block.code) {
+    final blockStyle = node.style.get(NotusAttribute.block);
+    if (blockStyle == NotusAttribute.block.code) {
       return theme.code.spacing;
-    } else if (style == NotusAttribute.block.quote) {
+    } else if (blockStyle == NotusAttribute.block.quote) {
       return theme.quote.spacing;
-    } else {
-      return theme.lists.spacing;
     }
+
+    final checkboxStyle = node.style.get(NotusAttribute.checkbox);
+    if (checkboxStyle != null) {
+      var top = theme.lists.spacing.top;
+      var bottom = theme.lists.spacing.bottom;
+      if (node.previous is CheckboxNode) {
+        top = theme.lists.lineSpacing.top;
+      }
+      if (node.next is CheckboxNode) {
+        bottom = theme.lists.lineSpacing.bottom;
+      }
+      return VerticalSpacing(top: top, bottom: bottom);
+    }
+    return theme.lists.spacing;
   }
 
   @override

@@ -212,16 +212,6 @@ class ZefyrThemeData {
           borderRadius: BorderRadius.circular(2),
         ),
       ),
-      checked: TextBlockTheme(
-        style: baseStyle,
-        spacing: baseSpacing,
-        lineSpacing: VerticalSpacing(bottom: 6),
-      ),
-      unchecked: TextBlockTheme(
-        style: baseStyle,
-        spacing: baseSpacing,
-        lineSpacing: VerticalSpacing(bottom: 6),
-      ),
     );
   }
 

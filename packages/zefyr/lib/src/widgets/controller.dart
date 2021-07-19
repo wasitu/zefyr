@@ -136,15 +136,22 @@ class ZefyrController extends ChangeNotifier {
         [
           NotusAttribute.heading.key,
           NotusAttribute.checkbox.key,
-          NotusAttribute.block.key
+          NotusAttribute.block.key,
+          NotusAttribute.decision.key,
         ].contains(attribute.key)) {
       // unset
-      if (getSelectionStyle().contains(NotusAttribute.block))
+      if (getSelectionStyle().contains(NotusAttribute.block)) {
         formatText(index, length, NotusAttribute.block.unset);
-      if (getSelectionStyle().contains(NotusAttribute.heading))
+      }
+      if (getSelectionStyle().contains(NotusAttribute.heading)) {
         formatText(index, length, NotusAttribute.heading.unset);
-      if (getSelectionStyle().contains(NotusAttribute.checkbox))
+      }
+      if (getSelectionStyle().contains(NotusAttribute.checkbox)) {
         formatText(index, length, NotusAttribute.checkbox.unset);
+      }
+      if (getSelectionStyle().contains(NotusAttribute.decision)) {
+        formatText(index, length, NotusAttribute.decision.unset);
+      }
     }
 
     formatText(index, length, attribute);

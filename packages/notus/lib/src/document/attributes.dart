@@ -83,6 +83,7 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
     NotusAttribute.block.key: NotusAttribute.block,
     NotusAttribute.embed.key: NotusAttribute.embed,
     NotusAttribute.checkbox.key: NotusAttribute.checkbox,
+    NotusAttribute.decision.key: NotusAttribute.decision,
     NotusAttribute.indent.key: NotusAttribute.indent,
     NotusAttribute.id.key: NotusAttribute.id,
     NotusAttribute.timestamp.key: NotusAttribute.timestamp,
@@ -158,6 +159,10 @@ class NotusAttribute<T> implements NotusAttributeBuilder<T> {
   /// Timestamp attribute
   // ignore: const_eval_throws_exception
   static const timestamp = TimestampAttributeBuilder._();
+
+  /// Decision attribute
+  // ignore: const_eval_throws_exception
+  static const decision = DecisionAttributeBuilder._();
 
   /// Embed style attribute.
   // ignore: const_eval_throws_exception
@@ -482,6 +487,15 @@ class IdAttributeBuilder extends NotusAttributeBuilder<String> {
 class TimestampAttributeBuilder extends NotusAttributeBuilder<int> {
   const TimestampAttributeBuilder._()
       : super._('timestamp', NotusAttributeScope.line);
+}
+
+/// Builder for decision attribute styles.
+///
+/// There is no need to use this class directly, consider using
+/// [NotusAttribute.decision] instead.
+class DecisionAttributeBuilder extends NotusAttributeBuilder<bool> {
+  const DecisionAttributeBuilder._()
+      : super._('decision', NotusAttributeScope.line);
 }
 
 class EmbedAttributeBuilder

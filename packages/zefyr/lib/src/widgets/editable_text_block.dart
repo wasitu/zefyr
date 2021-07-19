@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:notus/notus.dart';
 import 'package:numerus/numerus.dart';
+import 'package:zefyr/zefyr.dart';
 
 import '../rendering/editable_text_block.dart';
 import 'cursor.dart';
@@ -22,6 +23,7 @@ class EditableTextBlock extends StatelessWidget {
   final bool hasFocus;
   final EdgeInsets contentPadding;
   final ZefyrEmbedBuilder embedBuilder;
+  final ZefyrController controller;
 
   EditableTextBlock({
     Key key,
@@ -33,8 +35,9 @@ class EditableTextBlock extends StatelessWidget {
     @required this.selectionColor,
     @required this.enableInteractiveSelection,
     @required this.hasFocus,
-    this.contentPadding,
     @required this.embedBuilder,
+    @required this.controller,
+    this.contentPadding,
   })  : assert(hasFocus != null),
         assert(embedBuilder != null),
         super(key: key);
@@ -125,30 +128,42 @@ class EditableTextBlock extends StatelessWidget {
       );
     }
 
+    final decision = node.style.get(NotusAttribute.decision);
+    if (decision?.value ?? false) {
+      return Container(
+        alignment: AlignmentDirectional.topEnd,
+        height: 24 * MediaQuery.of(context).textScaleFactor,
+        padding: EdgeInsetsDirectional.only(end: 8, start: indent * 32.0),
+        child: Builder(builder: (context) {
+          final builder = controller.document.callbacks['decision_widget'];
+          if (builder == null) return SizedBox();
+          return builder();
+        }),
+      );
+    }
+
     final checkbox = node.style.get(NotusAttribute.checkbox);
     if (checkbox == NotusAttribute.checkbox.checked) {
       return Container(
         alignment: AlignmentDirectional.topEnd,
-        child: Checkbox(
-          value: true,
-          onChanged: (value) {
-            // src/widgets/editor.dart :: _handleComponent
-          },
-        ),
         height: 24 * MediaQuery.of(context).textScaleFactor,
         padding: EdgeInsetsDirectional.only(end: 8, start: indent * 32.0),
+        child: Builder(builder: (context) {
+          final builder = controller.document.callbacks['checkbox_widget'];
+          if (builder == null) return SizedBox();
+          return builder(true, node);
+        }),
       );
     } else if (checkbox == NotusAttribute.checkbox.unchecked) {
       return Container(
         alignment: AlignmentDirectional.topEnd,
-        child: Checkbox(
-          value: false,
-          onChanged: (value) {
-            // src/widgets/editor.dart :: _handleComponent
-          },
-        ),
         height: 24 * MediaQuery.of(context).textScaleFactor,
         padding: EdgeInsetsDirectional.only(end: 8, start: indent * 32.0),
+        child: Builder(builder: (context) {
+          final builder = controller.document.callbacks['checkbox_widget'];
+          if (builder == null) return SizedBox();
+          return builder(false, node);
+        }),
       );
     }
     return null;
@@ -194,10 +209,10 @@ class EditableTextBlock extends StatelessWidget {
         lineSpacing = theme.lists.lineSpacing;
       }
 
-      final checkbox = this.node.style.get(NotusAttribute.checkbox);
-      if (this.node is CheckboxNode) {
+      if (this.node is CheckboxNode || this.node is DecisionNode) {
         lineSpacing = theme.lists.lineSpacing;
       }
+
       top = lineSpacing.top;
       bottom = lineSpacing.bottom;
     }

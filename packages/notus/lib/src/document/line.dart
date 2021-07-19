@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 import 'dart:math' as math;
 
+import 'package:notus/src/document/decision.dart';
 import 'package:notus/src/document/embeds.dart';
 import 'package:notus/src/document/checkbox.dart';
 import 'package:quill_delta/quill_delta.dart';
@@ -345,6 +346,23 @@ class LineNode extends ContainerNode<LeafNode>
       } else if (style != NotusAttribute.checkbox.unset) {
         // Only wrap with a new block if this is not an unset
         final node = CheckboxNode();
+        node.applyAttribute(style);
+        wrap(node);
+        node.optimize();
+      }
+    }
+
+    // decision level
+    if (newStyle.contains(NotusAttribute.decision)) {
+      final style = newStyle.get(NotusAttribute.decision);
+      if (parent is DecisionNode) {
+        if (style == NotusAttribute.decision.unset) {
+          unwrap();
+        }
+      } else if (style != NotusAttribute.decision.unset) {
+        // Only wrap with a new block if this is not an unset
+        final node = DecisionNode();
+        node.applyAttribute(style);
         wrap(node);
         node.optimize();
       }
